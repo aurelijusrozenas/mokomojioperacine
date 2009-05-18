@@ -31,35 +31,36 @@ struct idt_ptr idtp;
 /* Ði funkcija apraðyta start.asm. Ji skirta PDL uþkrovimui */
 extern void idt_load();
 
-/* Use this function to set an entry in the IDT. Alot simpler
-*  than twiddling with the GDT ;) */
+/* Funkcija skirta PDL áraðø nustatymui */
 void idt_set_gate(unsigned char num, unsigned long base, unsigned short sel, unsigned char flags)
 {
-    /* The interrupt routine's base address */
+    /* Pertraukimo popragramës bazinis adresas */
     idt[num].base_lo = (base & 0xFFFF);
     idt[num].base_hi = (base >> 16) & 0xFFFF;
-
-    /* The segment or 'selector' that this IDT entry will use
-    *  is set here, along with any access flags */
+	
+	/* Segmentas arba selektorius (angl. selector), kurá
+	* naudos ðis PDL áraðas */
     idt[num].sel = sel;
     idt[num].always0 = 0;
     idt[num].flags = flags;
 }
 
-/* Installs the IDT */
+/* Ádiega PDL */
 void idt_install()
 {
-    /* Sets the special IDT pointer up, just like in 'gdt.c' */
+    /* Sukuria specialià nuorodà, reikalingà PDL uþkrovimui.
+	 * Identiðka GDL nuorodai. */
     idtp.limit = (sizeof (struct idt_entry) * 256) - 1;
     idtp.base = &idt;
 
-    /* Clear out the entire IDT, initializing it to zeros */
+    /* Visus PDL áraðus "nunulina" */
     memset(&idt, 0, sizeof(struct idt_entry) * 256);
 
-    /* Add any new ISRs to the IDT here using idt_set_gate */
+    /* Èia galima átraukti naujas pertraukimø apdorojimo paprogrames,
+	 * naudojantis funkcija idt_set_gate */
 
 
 
-    /* Points the processor's internal register to the new IDT */
+    /* Nustato procesoriaus registrà á PDL */
     idt_load();
 }

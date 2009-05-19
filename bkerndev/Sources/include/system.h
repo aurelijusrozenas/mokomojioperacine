@@ -8,13 +8,16 @@
 
 typedef int size_t;
 
-/* This defines what the stack looks like after an ISR was running */
+/* Ði struktûra apibrëþia stekà po kurios nors PAP þymës ávykdymo */
 struct regs
 {
-    unsigned int gs, fs, es, ds;
+    unsigned int gs, fs, es, ds;	// segmentø adresai
+	// patalpino "pusha"
     unsigned int edi, esi, ebp, esp, ebx, edx, ecx, eax;
-    unsigned int int_no, err_code;
-    unsigned int eip, cs, eflags, useresp, ss;    
+	// pertraukimo numeris ir klaidos kodas
+    unsigned int int_no, err_code; 
+	// automatiðkai patalpino procesorius 
+   unsigned int eip, cs, eflags, useresp, ss; 
 };
 
 /* MAIN.C */

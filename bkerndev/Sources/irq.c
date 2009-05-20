@@ -5,8 +5,8 @@
 *  Notes: No warranty expressed or implied. Use at own risk. */
 #include <system.h>
 
-/* These are own ISRs that point to our special IRQ handler
-*  instead of the regular 'fault_handler' function */
+/* Tai yra PAP, kurie rodo á specialø PU dorotojà vietoj to,
+* kad rodytø á tipinæ funkijà "fault_handler" kitoms PAP */
 extern void irq0();
 extern void irq1();
 extern void irq2();
@@ -24,34 +24,30 @@ extern void irq13();
 extern void irq14();
 extern void irq15();
 
-/* This array is actually an array of function pointers. We use
-*  this to handle custom IRQ handlers for a given IRQ */
+/* Funkcijø nuorodø masyvas, kurio paskirtis saugoti
+* funkcijø adresus. Vëliau ðie adresai naudojami
+* PU apdorojimui */
 void *irq_routines[16] =
 {
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0
 };
 
-/* This installs a custom IRQ handler for the given IRQ */
+/* Ádiegia nestandartinæ PU doroktlæ pateiktam PU pagal numerá*/
 void irq_install_handler(int irq, void (*handler)(struct regs *r))
 {
     irq_routines[irq] = handler;
 }
 
-/* This clears the handler for a given IRQ */
+/* Paðalina pateikto PU doroklæ ið funkcijø nuorodø sàraðo */
 void irq_uninstall_handler(int irq)
 {
     irq_routines[irq] = 0;
 }
 
-/* Normally, IRQs 0 to 7 are mapped to entries 8 to 15. This
-*  is a problem in protected mode, because IDT entry 8 is a
-*  Double Fault! Without remapping, every time IRQ0 fires,
-*  you get a Double Fault Exception, which is NOT actually
-*  what's happening. We send commands to the Programmable
-*  Interrupt Controller (PICs - also called the 8259's) in
-*  order to make IRQ0 to 15 be remapped to IDT entries 32 to
-*  47 */
+/* Standartiðkai, PU  nuo 0 iki 7 rodo á PDL áraðus nuo 8 iki 15. 
+* Tai yra problema,  nes ðios reiðkmës yra jau uþimtos,
+* PU nuo  0 iki 15 perprogramuojamas á PDL áraðus nuo 32 iki 47 */
 void irq_remap(void)
 {
     outportb(0x20, 0x11);
@@ -66,9 +62,8 @@ void irq_remap(void)
     outportb(0xA1, 0x0);
 }
 
-/* We first remap the interrupt controllers, and then we install
-*  the appropriate ISRs to the correct entries in the IDT. This
-*  is just like installing the exception handlers */
+/* Pirma perprogramuojami pertraukimø valdikliai (irq_remap).
+* Po to PAP nustatomos á atitinkamus PDL áraðus. */
 void irq_install()
 {
     irq_remap();
@@ -92,38 +87,35 @@ void irq_install()
     idt_set_gate(47, (unsigned)irq15, 0x08, 0x8E);
 }
 
-/* Each of the IRQ ISRs point to this function, rather than
-*  the 'fault_handler' in 'isrs.c'. The IRQ Controllers need
-*  to be told when you are done servicing them, so you need
-*  to send them an "End of Interrupt" command (0x20). There
-*  are two 8259 chips: The first exists at 0x20, the second
-*  exists at 0xA0. If the second controller (an IRQ from 8 to
-*  15) gets an interrupt, you need to acknowledge the
-*  interrupt at BOTH controllers, otherwise, you only send
-*  an EOI command to the first controller. If you don't send
-*  an EOI, you won't raise any more IRQs */
+/* Kiekviena PU paprogramë rodo á ðià funkcijà, o ne "fault_handler".
+*  PU valdikliams reikia praneðti, kada jie buvo aptarnauti, t.y.,
+*  nusiøsti jiems komandà - "Pertraukimo pabaiga" (PA).
+*  Yra  du lustai: pirmas adresu 0x20, antras - 0xA0. Jei ávyksta 
+*  pertraukimas ðalutiniam valdiklyje (PU nuo 8 iki 15, tuomet 
+*  apie apdorojimo pabaigà reikia informuoti abu valdiklius.
+*  Kitu atveju reikia tik nusiøsti PA á pirmàjá valdiklá.
+*  Jei ðis praneðimas nebus nusiøstas, tai neávyks në vienas
+* naujas PU */
 void irq_handler(struct regs *r)
 {
-    /* This is a blank function pointer */
+    /* Tuðèia funkcijos nuoroda */
     void (*handler)(struct regs *r);
 
-    /* Find out if we have a custom handler to run for this
-    *  IRQ, and then finally, run it */
+    /* IÐsiaiðkina ar yra paruoðta konkreèiam PU skirta doroklë */
     handler = irq_routines[r->int_no - 32];
     if (handler)
     {
         handler(r);
     }
 
-    /* If the IDT entry that was invoked was greater than 40
-    *  (meaning IRQ8 - 15), then we need to send an EOI to
-    *  the slave controller */
+    /* Jei ávykio aukðtesnio numerio pertraukimas nei 40
+	* (atitinkamai PU 8 - 15),  tada reikia nusiøsti PA á antràjá
+	* valdiklá */
     if (r->int_no >= 40)
     {
         outportb(0xA0, 0x20);
     }
 
-    /* In either case, we need to send an EOI to the master
-    *  interrupt controller too */
+    /* Bet kuriuo atveju PA reikia siøsti á pagrindiná valdiklá */
     outportb(0x20, 0x20);
 }

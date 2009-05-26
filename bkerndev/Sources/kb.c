@@ -1,4 +1,4 @@
-/* bkerndev - Bran's Kernel Development Tutorial
+﻿/* bkerndev - Bran's Kernel Development Tutorial
 *  By:   Brandon F. (friesenb@gmail.com)
 *  Desc: Keyboard driver
 *

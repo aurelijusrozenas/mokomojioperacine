@@ -1,11 +1,11 @@
-/* bkerndev - Bran's Kernel Development Tutorial
+ï»¿/* bkerndev - Bran's Kernel Development Tutorial
 *  By:   Brandon F. (friesenb@gmail.com)
 *  Desc: Interrupt Descriptor Table management
 *
 *  Notes: No warranty expressed or implied. Use at own risk. */
 #include <system.h>
 
-/* Apibrëþia PDL áraðà */
+/* ApibrÄ—Å¾ia PDL Ä¯raÅ¡Ä… */
 struct idt_entry
 {
     unsigned short base_lo;
@@ -21,46 +21,46 @@ struct idt_ptr
     unsigned int base;
 } __attribute__((packed));
 
-/* 256 PDL áraðø deklaravimas. Taèiau pavyzdinë programa naudos 
- * tik 32. Jei ávyksta neapibrëþtas pertraukimas, tuomet tai sukelia
- * "Unhandled Interrupt" klaidà. Be to, kiekvienas deskriptorius, 
- * kurio naudojamumo bitas 0, generuoja tokià pat klaidà */
+/* 256 PDL Ä¯raÅ¡Å³ deklaravimas. TaÄiau pavyzdinÄ— programa naudos 
+ * tik 32. Jei Ä¯vyksta neapibrÄ—Å¾tas pertraukimas, tuomet tai sukelia
+ * "Unhandled Interrupt" klaidÄ…. Be to, kiekvienas deskriptorius, 
+ * kurio naudojamumo bitas 0, generuoja tokiÄ… pat klaidÄ… */
 struct idt_entry idt[256];
 struct idt_ptr idtp;
 
-/* Ði funkcija apraðyta start.asm. Ji skirta PDL uþkrovimui */
+/* Å i funkcija apraÅ¡yta start.asm. Ji skirta PDL uÅ¾krovimui */
 extern void idt_load();
 
-/* Funkcija skirta PDL áraðø nustatymui */
+/* Funkcija skirta PDL Ä¯raÅ¡Å³ nustatymui */
 void idt_set_gate(unsigned char num, unsigned long base, unsigned short sel, unsigned char flags)
 {
-    /* Pertraukimo popragramës bazinis adresas */
+    /* Pertraukimo popragramÄ—s bazinis adresas */
     idt[num].base_lo = (base & 0xFFFF);
     idt[num].base_hi = (base >> 16) & 0xFFFF;
 	
-	/* Segmentas arba selektorius (angl. selector), kurá
-	* naudos ðis PDL áraðas */
+	/* Segmentas arba selektorius (angl. selector), kurÄ¯
+	* naudos Å¡is PDL Ä¯raÅ¡as */
     idt[num].sel = sel;
     idt[num].always0 = 0;
     idt[num].flags = flags;
 }
 
-/* Ádiega PDL */
+/* Ä®diega PDL */
 void idt_install()
 {
-    /* Sukuria specialià nuorodà, reikalingà PDL uþkrovimui.
-	 * Identiðka GDL nuorodai. */
+    /* Sukuria specialiÄ… nuorodÄ…, reikalingÄ… PDL uÅ¾krovimui.
+	 * IdentiÅ¡ka GDL nuorodai. */
     idtp.limit = (sizeof (struct idt_entry) * 256) - 1;
     idtp.base = &idt;
 
-    /* Visus PDL áraðus "nunulina" */
+    /* Visus PDL Ä¯raÅ¡us "nunulina" */
     memset(&idt, 0, sizeof(struct idt_entry) * 256);
 
-    /* Èia galima átraukti naujas pertraukimø apdorojimo paprogrames,
+    /* ÄŒia galima Ä¯traukti naujas pertraukimÅ³ apdorojimo paprogrames,
 	 * naudojantis funkcija idt_set_gate */
 
 
 
-    /* Nustato procesoriaus registrà á PDL */
+    /* Nustato procesoriaus registrÄ… Ä¯ PDL */
     idt_load();
 }

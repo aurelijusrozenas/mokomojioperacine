@@ -1,4 +1,4 @@
-/* bkerndev - Bran's Kernel Development Tutorial
+ï»¿/* bkerndev - Bran's Kernel Development Tutorial
 *  By:   Brandon F. (friesenb@gmail.com)
 *  Desc: Global Descriptor Table management
 *
@@ -26,14 +26,14 @@ struct gdt_ptr
 struct gdt_entry gdt[3];
 struct gdt_ptr gp;
 
-/* Funkcija, kuri apibrëşta faile start.asm, 
-* kurios paskirtis yra, tinkamai uşkrauti naujà GDL */
+/* Funkcija, kuri apibrÄ—Å¾ta faile start.asm, 
+* kurios paskirtis yra, tinkamai uÅ¾krauti naujÄ… GDL */
 extern void gdt_flush();
 
-/* Nustato deskriptoriø GDL viduje */
+/* Nustato deskriptoriÅ³ GDL viduje */
 void gdt_set_gate(int num, unsigned long base, unsigned long limit, unsigned char access, unsigned char gran)
 {
-    /* Nustato deskriptoriaus baziná adresà */
+    /* Nustato deskriptoriaus bazinÄ¯ adresÄ… */
     gdt[num].base_low = (base & 0xFFFF);
     gdt[num].base_middle = (base >> 16) & 0xFF;
     gdt[num].base_high = (base >> 24) & 0xFF;
@@ -42,35 +42,35 @@ void gdt_set_gate(int num, unsigned long base, unsigned long limit, unsigned cha
     gdt[num].limit_low = (limit & 0xFFFF);
     gdt[num].granularity = ((limit >> 16) & 0x0F);
 
-    /* Nustato granuliğkumà ir priëjimo teises */
+    /* Nustato granuliÅ¡kumÄ… ir priÄ—jimo teises */
     gdt[num].granularity |= (gran & 0xF0);
     gdt[num].access = access;
 }
 
-/* Funkcijos paskirtis yra sukurti naujà GDL. 
-*  Ği funkcija sukuria specialios struktûros nuorodà, kurios pagalba 
-*  galima uşkrauti naujàjà GDL. 
-*  Taip pat ji árağo tris deskriptorius.
-*  Paèioje pabaigoje iğkvieèia gdt_flush(), kuris nurodo procesoriui,
-*  kur yra naujoji GDL  bei perstato segmentø registrus */
+/* Funkcijos paskirtis yra sukurti naujÄ… GDL. 
+*  Å i funkcija sukuria specialios struktÅ«ros nuorodÄ…, kurios pagalba 
+*  galima uÅ¾krauti naujÄ…jÄ… GDL. 
+*  Taip pat ji Ä¯raÅ¡o tris deskriptorius.
+*  PaÄioje pabaigoje iÅ¡kvieÄia gdt_flush(), kuris nurodo procesoriui,
+*  kur yra naujoji GDL  bei perstato segmentÅ³ registrus */
 void gdt_install()
 {
-    /* Nustato GDL lentelës nuorodà ir limità*/
+    /* Nustato GDL lentelÄ—s nuorodÄ… ir limitÄ…*/
     gp.limit = (sizeof(struct gdt_entry) * 3) - 1;
     gp.base = &gdt;
 
     /* NULL deskriptorius*/
     gdt_set_gate(0, 0, 0, 0, 0);
 
-    /* Antrasis árağas yra kodo segmentas. 
-	* Bazinis adresas 0, limitas 4 gigabaitai, granuliğkumas 4 kilobaitai,
-	*  naudoja 32 bitø  operacijas */
+    /* Antrasis Ä¯raÅ¡as yra kodo segmentas. 
+	* Bazinis adresas 0, limitas 4 gigabaitai, granuliÅ¡kumas 4 kilobaitai,
+	*  naudoja 32 bitÅ³  operacijas */
     gdt_set_gate(1, 0, 0xFFFFFFFF, 0x9A, 0xCF);
 
-    /* Lygiai tas pats, kas ankstesnis árağas, taèiau deskriptoriaus tipas
-	* nurodo, kad tai duomenø segmentas */
+    /* Lygiai tas pats, kas ankstesnis Ä¯raÅ¡as, taÄiau deskriptoriaus tipas
+	* nurodo, kad tai duomenÅ³ segmentas */
     gdt_set_gate(2, 0, 0xFFFFFFFF, 0x92, 0xCF);
 
-    /* Senàjá GDL pakeièia naujuoju! */
+    /* SenÄ…jÄ¯ GDL pakeiÄia naujuoju! */
     gdt_flush();
 }

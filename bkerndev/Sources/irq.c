@@ -1,12 +1,12 @@
-/* bkerndev - Bran's Kernel Development Tutorial
+ï»¿/* bkerndev - Bran's Kernel Development Tutorial
 *  By:   Brandon F. (friesenb@gmail.com)
 *  Desc: Interrupt Request management
 *
 *  Notes: No warranty expressed or implied. Use at own risk. */
 #include <system.h>
 
-/* Tai yra PAP, kurie rodo á specialø PU dorotojà vietoj to,
-* kad rodytø á tipinæ funkijà "fault_handler" kitoms PAP */
+/* Tai yra PAP, kurie rodo Ä¯ specialÅ³ PU dorotojÄ… vietoj to,
+* kad rodytÅ³ Ä¯ tipinÄ™ funkijÄ… "fault_handler" kitoms PAP */
 extern void irq0();
 extern void irq1();
 extern void irq2();
@@ -24,8 +24,8 @@ extern void irq13();
 extern void irq14();
 extern void irq15();
 
-/* Funkcijø nuorodø masyvas, kurio paskirtis saugoti
-* funkcijø adresus. Vëliau ğie adresai naudojami
+/* FunkcijÅ³ nuorodÅ³ masyvas, kurio paskirtis saugoti
+* funkcijÅ³ adresus. VÄ—liau Å¡ie adresai naudojami
 * PU apdorojimui */
 void *irq_routines[16] =
 {
@@ -33,21 +33,21 @@ void *irq_routines[16] =
     0, 0, 0, 0, 0, 0, 0, 0
 };
 
-/* Ádiegia nestandartinæ PU doroktlæ pateiktam PU pagal numerá*/
+/* Ä®diegia nestandartinÄ™ PU doroktlÄ™ pateiktam PU pagal numerÄ¯*/
 void irq_install_handler(int irq, void (*handler)(struct regs *r))
 {
     irq_routines[irq] = handler;
 }
 
-/* Pağalina pateikto PU doroklæ iğ funkcijø nuorodø sàrağo */
+/* PaÅ¡alina pateikto PU doroklÄ™ iÅ¡ funkcijÅ³ nuorodÅ³ sÄ…raÅ¡o */
 void irq_uninstall_handler(int irq)
 {
     irq_routines[irq] = 0;
 }
 
-/* Standartiğkai, PU  nuo 0 iki 7 rodo á PDL árağus nuo 8 iki 15. 
-* Tai yra problema,  nes ğios reiğkmës yra jau uşimtos,
-* PU nuo  0 iki 15 perprogramuojamas á PDL árağus nuo 32 iki 47 */
+/* StandartiÅ¡kai, PU  nuo 0 iki 7 rodo Ä¯ PDL Ä¯raÅ¡us nuo 8 iki 15. 
+* Tai yra problema,  nes Å¡ios reiÅ¡kmÄ—s yra jau uÅ¾imtos,
+* PU nuo  0 iki 15 perprogramuojamas Ä¯ PDL Ä¯raÅ¡us nuo 32 iki 47 */
 void irq_remap(void)
 {
     outportb(0x20, 0x11);
@@ -62,8 +62,8 @@ void irq_remap(void)
     outportb(0xA1, 0x0);
 }
 
-/* Pirma perprogramuojami pertraukimø valdikliai (irq_remap).
-* Po to PAP nustatomos á atitinkamus PDL árağus. */
+/* Pirma perprogramuojami pertraukimÅ³ valdikliai (irq_remap).
+* Po to PAP nustatomos Ä¯ atitinkamus PDL Ä¯raÅ¡us. */
 void irq_install()
 {
     irq_remap();
@@ -87,35 +87,35 @@ void irq_install()
     idt_set_gate(47, (unsigned)irq15, 0x08, 0x8E);
 }
 
-/* Kiekviena PU paprogramë rodo á ğià funkcijà, o ne "fault_handler".
-*  PU valdikliams reikia praneğti, kada jie buvo aptarnauti, t.y.,
-*  nusiøsti jiems komandà - "Pertraukimo pabaiga" (PA).
-*  Yra  du lustai: pirmas adresu 0x20, antras - 0xA0. Jei ávyksta 
-*  pertraukimas ğalutiniam valdiklyje (PU nuo 8 iki 15, tuomet 
-*  apie apdorojimo pabaigà reikia informuoti abu valdiklius.
-*  Kitu atveju reikia tik nusiøsti PA á pirmàjá valdiklá.
-*  Jei ğis praneğimas nebus nusiøstas, tai neávyks në vienas
+/* Kiekviena PU paprogramÄ— rodo Ä¯ Å¡iÄ… funkcijÄ…, o ne "fault_handler".
+*  PU valdikliams reikia praneÅ¡ti, kada jie buvo aptarnauti, t.y.,
+*  nusiÅ³sti jiems komandÄ… - "Pertraukimo pabaiga" (PA).
+*  Yra  du lustai: pirmas adresu 0x20, antras - 0xA0. Jei Ä¯vyksta 
+*  pertraukimas Å¡alutiniam valdiklyje (PU nuo 8 iki 15, tuomet 
+*  apie apdorojimo pabaigÄ… reikia informuoti abu valdiklius.
+*  Kitu atveju reikia tik nusiÅ³sti PA Ä¯ pirmÄ…jÄ¯ valdiklÄ¯.
+*  Jei Å¡is praneÅ¡imas nebus nusiÅ³stas, tai neÄ¯vyks nÄ— vienas
 * naujas PU */
 void irq_handler(struct regs *r)
 {
-    /* Tuğèia funkcijos nuoroda */
+    /* TuÅ¡Äia funkcijos nuoroda */
     void (*handler)(struct regs *r);
 
-    /* IĞsiaiğkina ar yra paruoğta konkreèiam PU skirta doroklë */
+    /* IÅ siaiÅ¡kina ar yra paruoÅ¡ta konkreÄiam PU skirta doroklÄ— */
     handler = irq_routines[r->int_no - 32];
     if (handler)
     {
         handler(r);
     }
 
-    /* Jei ávykio aukğtesnio numerio pertraukimas nei 40
-	* (atitinkamai PU 8 - 15),  tada reikia nusiøsti PA á antràjá
-	* valdiklá */
+    /* Jei Ä¯vykio aukÅ¡tesnio numerio pertraukimas nei 40
+	* (atitinkamai PU 8 - 15),  tada reikia nusiÅ³sti PA Ä¯ antrÄ…jÄ¯
+	* valdiklÄ¯ */
     if (r->int_no >= 40)
     {
         outportb(0xA0, 0x20);
     }
 
-    /* Bet kuriuo atveju PA reikia siøsti á pagrindiná valdiklá */
+    /* Bet kuriuo atveju PA reikia siÅ³sti Ä¯ pagrindinÄ¯ valdiklÄ¯ */
     outportb(0x20, 0x20);
 }

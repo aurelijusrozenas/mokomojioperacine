@@ -1,7 +1,7 @@
-#include <system.h>
+ï»¿#include <system.h>
 
-/* Funkcijø prototipai visoms doroklëms: 
-* pirmieji 32 PDL áraðai yra rezervuoti ir turi bûti aptarnaujami */
+/* FunkcijÅ³ prototipai visoms doroklÄ—ms: 
+* pirmieji 32 PDL Ä¯raÅ¡ai yra rezervuoti ir turi bÅ«ti aptarnaujami */
 extern void isr0();
 extern void isr1();
 extern void isr2();
@@ -35,12 +35,12 @@ extern void isr29();
 extern void isr30();
 extern void isr31();
 
-/* Nëra bûdo gauti visø funkcijø vardus, todël funkcija vykdo
-* daug beveik identiðkø sakiniø. Pirmieji 32 PDL lentelës áraðai rodo á 
-* pirmuosius 32 PAP.  Priëjimo vëliava nustatoma á  0x8E. 
-* Tai reiðkia, kad áraðas naudojamas, vykdomas þiede 0 bei 
-* jo paskutiniai 5 bitai nustatyti á reikiamà skaièiø 14, 
-* ðeðlioliktainiam pavidale E. */
+/* NÄ—ra bÅ«do gauti visÅ³ funkcijÅ³ vardus, todÄ—l funkcija vykdo
+* daug beveik identiÅ¡kÅ³ sakiniÅ³. Pirmieji 32 PDL lentelÄ—s Ä¯raÅ¡ai rodo Ä¯ 
+* pirmuosius 32 PAP.  PriÄ—jimo vÄ—liava nustatoma Ä¯  0x8E. 
+* Tai reiÅ¡kia, kad Ä¯raÅ¡as naudojamas, vykdomas Å¾iede 0 bei 
+* jo paskutiniai 5 bitai nustatyti Ä¯ reikiamÄ… skaiÄiÅ³ 14, 
+* Å¡eÅ¡lioliktainiam pavidale E. */
 void isrs_install()
 {
     idt_set_gate(0, (unsigned)isr0, 0x08, 0x8E);
@@ -80,8 +80,8 @@ void isrs_install()
     idt_set_gate(31, (unsigned)isr31, 0x08, 0x8E);
 }
 
-/* Paprastas eiluèiø masyvas, saugantis kiekvienos klaidos pavadinimà, 
-*  kuris iðgaunamas taip: exception_message[pertraukimo_numeris] */
+/* Paprastas eiluÄiÅ³ masyvas, saugantis kiekvienos klaidos pavadinimÄ…, 
+*  kuris iÅ¡gaunamas taip: exception_message[pertraukimo_numeris] */
 unsigned char *exception_messages[] =
 {
     "Division By Zero",
@@ -121,11 +121,11 @@ unsigned char *exception_messages[] =
     "Reserved"
 };
 
-/* Visos PAP rodo á ðià funkcijà. Ði funkcija tiesiog pasako, 
-* kokia klaida ávyko ir sustabdo sistemà, pasinaudodama begaliniu ciklu.
-* Kiekviena PAP iðjungia pertraukimø
-* mechanizmà, kad bûtø iðvengta PRK (IRQ)  ávykimo, kuris
-* galëtø sugadinti branduolio duomenø struktûras */
+/* Visos PAP rodo Ä¯ Å¡iÄ… funkcijÄ…. Å i funkcija tiesiog pasako, 
+* kokia klaida Ä¯vyko ir sustabdo sistemÄ…, pasinaudodama begaliniu ciklu.
+* Kiekviena PAP iÅ¡jungia pertraukimÅ³
+* mechanizmÄ…, kad bÅ«tÅ³ iÅ¡vengta PRK (IRQ)  Ä¯vykimo, kuris
+* galÄ—tÅ³ sugadinti branduolio duomenÅ³ struktÅ«ras */
 void fault_handler(struct regs *r)
 {
     if (r->int_no < 32)

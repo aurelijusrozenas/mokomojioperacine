@@ -1,4 +1,4 @@
-; bkerndev - Bran's Kernel Development Tutorial
+ï»¿; bkerndev - Bran's Kernel Development Tutorial
 ; By:   Brandon F. (friesenb@gmail.com)
 ; Desc: Kernel entry point, stack, and Interrupt Service Routines.
 ;
@@ -51,11 +51,11 @@ stublet:
 ; something special in order to set CS. We do what is called a
 ; far jump. A jump that includes a segment as well as an offset.
 ; This is declared in C as 'extern void gdt_flush();'
-global _gdt_flush     ; leidşia C kodui naudotis ğia funkcija
-extern _gp            ;  nurodo, kad gp kintamasis apibrëştas kitame faile
+global _gdt_flush     ; leidÅ¾ia C kodui naudotis Å¡ia funkcija
+extern _gp            ;  nurodo, kad gp kintamasis apibrÄ—Å¾tas kitame faile
 _gdt_flush:
-    lgdt [gp]         ; uşkrauna GDL naudodamasis mûsø specialia nuoroda
-    mov ax, 0x10      ; 0x10 yra duomenø segmento poslinkis naujoje GDL
+    lgdt [gp]         ; uÅ¾krauna GDL naudodamasis mÅ«sÅ³ specialia nuoroda
+    mov ax, 0x10      ; 0x10 yra duomenÅ³ segmento poslinkis naujoje GDL
     mov ds, ax
     mov es, ax
     mov fs, ax
@@ -63,17 +63,17 @@ _gdt_flush:
     mov ss, ax
     jmp 0x08:flush2   ; 0x08 yra kodo segmento poslinkis
 flush2:
-    ret               ; gráşta á C kodà
+    ret               ; grÄ¯Å¾ta Ä¯ C kodÄ…
 
-; Uşkrauna PDL, pasinaudodama specialia nuoroda idtp.
-; Ği funkcija kvieèiama iğ C kodo
+; UÅ¾krauna PDL, pasinaudodama specialia nuoroda idtp.
+; Å i funkcija kvieÄiama iÅ¡ C kodo
 global idt_load
 extern idtp
 idt_load:
     lidt [idtp]
     ret
 
-; Pertraukimø apdorojimo şymës
+; PertraukimÅ³ apdorojimo Å¾ymÄ—s
 global isr0
 global isr1
 global isr2
@@ -329,22 +329,22 @@ isr31:
 ; C faile esanti funkcija
 extern fault_handler
 
-;  Iğsaugo procesoriaus bûsenà, iğkvieèia C kalbos funkcijà,
-; galiausiai atstato bûsenà iğ steko
+;  IÅ¡saugo procesoriaus bÅ«senÄ…, iÅ¡kvieÄia C kalbos funkcijÄ…,
+; galiausiai atstato bÅ«senÄ… iÅ¡ steko
 isr_common_stub:
     pusha
     push ds
     push es
     push fs
     push gs
-    mov ax, 0x10	; uşkrauna branduolio duomenø segmento deskriptoriø
+    mov ax, 0x10	; uÅ¾krauna branduolio duomenÅ³ segmento deskriptoriÅ³
     mov ds, ax
     mov es, ax
     mov fs, ax
     mov gs, ax
     mov eax, esp
     push eax
-    mov eax, fault_handler	; uşkrauna branduolio duomenø segmento deskriptoriø
+    mov eax, fault_handler	; uÅ¾krauna branduolio duomenÅ³ segmento deskriptoriÅ³
     call eax
     pop eax
     pop gs
@@ -352,8 +352,8 @@ isr_common_stub:
     pop es
     pop ds
     popa
-    add esp, 8 ; Iğvalo klaidos kodà ir PAP numerá
-    iret       ; iğ steko paima penkias reikğmes: CS, EIP, EFLAGS, SS ir ESP
+    add esp, 8 ; IÅ¡valo klaidos kodÄ… ir PAP numerÄ¯
+    iret       ; iÅ¡ steko paima penkias reikÅ¡mes: CS, EIP, EFLAGS, SS ir ESP
 
 
 global irq0
@@ -377,7 +377,7 @@ global irq15
 irq0:
     cli
     push byte 0		; kaip ir PAP atveju, patalpinamas netikras klaidos kodas tam,
-    push byte 32	; kad bûtø iğlaikytas vientisumas
+    push byte 32	; kad bÅ«tÅ³ iÅ¡laikytas vientisumas
     jmp irq_common_stub
 
 ; 33: IRQ1
@@ -487,8 +487,8 @@ irq15:
 
 extern irq_handler
 
-; Veikia labai panağiai kaip PAP şymë "isr_common_stub"
-;Iiğkvieèia funkcijà esanèià faile "irc.c"
+; Veikia labai panaÅ¡iai kaip PAP Å¾ymÄ— "isr_common_stub"
+;IiÅ¡kvieÄia funkcijÄ… esanÄiÄ… faile "irc.c"
 irq_common_stub:
     pusha
     push ds

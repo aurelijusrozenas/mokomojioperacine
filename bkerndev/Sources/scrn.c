@@ -1,45 +1,45 @@
-#include <system.h>
+ï»¿#include <system.h>
 
-/* Nuoroda á teksto atmintá,  teskto ir fono spalvos,  x ir y kursoriø koordinatës*/
+/* Nuoroda Ä¯ teksto atmintÄ¯,  teskto ir fono spalvos,  x ir y kursoriÅ³ koordinatÄ—s*/
 unsigned short *textmemptr;
 int attrib = 0x0F;
 int csr_x = 0, csr_y = 0;
 
-/* Paslenka ekranà */
+/* Paslenka ekranÄ… */
 void scroll(void)
 {
     unsigned blank, temp;
 
-    /* Tuğèia vieta yra tarpas, kuris gali turëti fono spalvà */
+    /* TuÅ¡Äia vieta yra tarpas, kuris gali turÄ—ti fono spalvÄ… */
     blank = 0x20 | (attrib << 8);
 
-    /* 25 eilutë paskutë, reiğkia reikia paslinkti á virğø */
+    /* 25 eilutÄ— paskutÄ—, reiÅ¡kia reikia paslinkti Ä¯ virÅ¡Å³ */
     if(csr_y >= 25)
     {
-        /* Patraukia dabartiná tekstà viena eilute atgal */
+        /* Patraukia dabartinÄ¯ tekstÄ… viena eilute atgal */
         temp = csr_y - 25 + 1;
         memcpy (textmemptr, textmemptr + temp * 80, (25 - temp) * 80 * 2);
 
-        /* Paskutinæ eilutæ uşpildom tarpais */
+        /* PaskutinÄ™ eilutÄ™ uÅ¾pildom tarpais */
         memsetw (textmemptr + (25 - temp) * 80, blank, 80);
         csr_y = 25 - 1;
     }
 }
 
-/* Atnaujina kursoriø: mirksinti linija akrane
+/* Atnaujina kursoriÅ³: mirksinti linija akrane
 *  po paskutinio atspausdinto simbolio */
 void move_csr(void)
 {
     unsigned temp;
 
-    /* Formulë indekso radimui linijinëj atminty, iğreikğta:
+    /* FormulÄ— indekso radimui linijinÄ—j atminty, iÅ¡reikÅ¡ta:
     *  Indeksas = [(y * plotis) + x] */
     temp = csr_y * 80 + csr_x;
 
-  /* Nusiunèia komandà á 14 ir 15 indeksus esanèius
+  /* NusiunÄia komandÄ… Ä¯ 14 ir 15 indeksus esanÄius
     * VGA kontrolerio CRT valdymo registre (Control Register). 
-    * Tai yra aukğtesnieji ir şemesnieji baiti, kurie rodo, kur
-    *  kursorius turi mirksëti.
+    * Tai yra aukÅ¡tesnieji ir Å¾emesnieji baiti, kurie rodo, kur
+    *  kursorius turi mirksÄ—ti.
     *  Detaliau:  http://www.brackeen.com/home/vga */
     outportb(0x3D4, 14);
     outportb(0x3D5, temp >> 8);
@@ -47,56 +47,56 @@ void move_csr(void)
     outportb(0x3D5, temp);
 }
 
-/* Iğvalo ekranà */
+/* IÅ¡valo ekranÄ… */
 void cls()
 {
     unsigned blank;
     int i;
 
-    /* Short tipo kintamasis, kuris reiğkia tarpà*/
+    /* Short tipo kintamasis, kuris reiÅ¡kia tarpÄ…*/
     blank = 0x20 | (attrib << 8);
 
-    /* Visà ekranà uşpildo tarpais */
+    /* VisÄ… ekranÄ… uÅ¾pildo tarpais */
     for(i = 0; i < 25; i++)
         memsetw (textmemptr + i * 80, blank, 80);
 
-    /* Atnaujina virtualø kursoriø ir pastumia tikràjá*/
+    /* Atnaujina virtualÅ³ kursoriÅ³ ir pastumia tikrÄ…jÄ¯*/
     csr_x = 0;
     csr_y = 0;
     move_csr();
 }
 
-/* Iğveda vienà simbolá */
+/* IÅ¡veda vienÄ… simbolÄ¯ */
 void putch(unsigned char c)
 {
     unsigned short *where;
     unsigned att = attrib << 8;
 
-    /* Backspace simbolio valdymas, gráştam viena pozicija atgal */
+    /* Backspace simbolio valdymas, grÄ¯Å¾tam viena pozicija atgal */
     if(c == 0x08)
     {
         if(csr_x != 0) csr_x--;
     }
-    /* Tab simbolio valdymas vykdomas paiddintant kursoriø x. Bet á 
-	* tokià pozicijà, kuri dalinasi iğ 8 */
+    /* Tab simbolio valdymas vykdomas paiddintant kursoriÅ³ x. Bet Ä¯ 
+	* tokiÄ… pozicijÄ…, kuri dalinasi iÅ¡ 8 */
     else if(c == 0x09)
     {
         csr_x = (csr_x + 8) & ~(8 - 1);
     }
-    /* 'Carriage Return' apdorjimas - kursorius gràşinamas á 
-	* eilutës pradşià */
+    /* 'Carriage Return' apdorjimas - kursorius grÄ…Å¾inamas Ä¯ 
+	* eilutÄ—s pradÅ¾iÄ… */
     else if(c == '\r')
     {
         csr_x = 0;
     }
-    /* Nauja eilutë: gráştam á pradşià eilutës horizontaliai,
-	vertikaliai viena eilute şemyn*/
+    /* Nauja eilutÄ—: grÄ¯Å¾tam Ä¯ pradÅ¾iÄ… eilutÄ—s horizontaliai,
+	vertikaliai viena eilute Å¾emyn*/
     else if(c == '\n')
     {
         csr_x = 0;
         csr_y++;
     }
-    /* Simboliø iğvedimas */
+    /* SimboliÅ³ iÅ¡vedimas */
     else if(c >= ' ')
     {
         where = textmemptr + (csr_y * 80 + csr_x);
@@ -104,20 +104,20 @@ void putch(unsigned char c)
         csr_x++;
     }
 
-    /* Jei kursorius pasiekë eilutës pabaigà, tai pereina á naujà eilutæ */
+    /* Jei kursorius pasiekÄ— eilutÄ—s pabaigÄ…, tai pereina Ä¯ naujÄ… eilutÄ™ */
     if(csr_x >= 80)
     {
         csr_x = 0;
         csr_y++;
     }
 
-    /* Paslenka ekranà, jei reikia ir pajudina kursoriø */
+    /* Paslenka ekranÄ…, jei reikia ir pajudina kursoriÅ³ */
     scroll();
     move_csr();
 }
 
-/* Iğveda teksto gabalà naudodamas aukğèiau esanèià funkcijà 
-* vienam simboliui iğvesti*/
+/* IÅ¡veda teksto gabalÄ… naudodamas aukÅ¡Äiau esanÄiÄ… funkcijÄ… 
+* vienam simboliui iÅ¡vesti*/
 void puts(unsigned char *text)
 {
     int i;
@@ -128,14 +128,14 @@ void puts(unsigned char *text)
     }
 }
 
-/* Spalvø nustatymas*/
+/* SpalvÅ³ nustatymas*/
 void settextcolor(unsigned char forecolor, unsigned char backcolor)
 {
-    /* Virğutiniai 4 bitai fonas, apatiniai 4 teksto spalva */
+    /* VirÅ¡utiniai 4 bitai fonas, apatiniai 4 teksto spalva */
     attrib = (backcolor << 4) | (forecolor & 0x0F);
 }
 
-/* Nustato tekstinës atminties adresà ir iğvalo ekranà */
+/* Nustato tekstinÄ—s atminties adresÄ… ir iÅ¡valo ekranÄ… */
 void init_video(void)
 {
     textmemptr = (unsigned short *)0xB8000;

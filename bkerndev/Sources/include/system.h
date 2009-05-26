@@ -1,4 +1,4 @@
-/* bkerndev - Bran's Kernel Development Tutorial
+ï»¿/* bkerndev - Bran's Kernel Development Tutorial
 *  By:   Brandon F. (friesenb@gmail.com)
 *  Desc: Global function declarations and type definitions
 *
@@ -8,15 +8,15 @@
 
 typedef int size_t;
 
-/* Ği struktûra apibrëşia stekà po kurios nors PAP şymës ávykdymo */
+/* Å i struktÅ«ra apibrÄ—Å¾ia stekÄ… po kurios nors PAP Å¾ymÄ—s Ä¯vykdymo */
 struct regs
 {
-    unsigned int gs, fs, es, ds;	// segmentø adresai
+    unsigned int gs, fs, es, ds;	// segmentÅ³ adresai
 	// patalpino "pusha"
     unsigned int edi, esi, ebp, esp, ebx, edx, ecx, eax;
 	// pertraukimo numeris ir klaidos kodas
     unsigned int int_no, err_code; 
-	// automatiğkai patalpino procesorius 
+	// automatiÅ¡kai patalpino procesorius 
    unsigned int eip, cs, eflags, useresp, ss; 
 };
 
